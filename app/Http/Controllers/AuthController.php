@@ -22,6 +22,11 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    public function registerForm()
+    {
+        return view('components.auth.register');
+    }
+
     public function register(RegisterRequest $request)
     {
         $validated = $request->validated();
@@ -36,9 +41,16 @@ class AuthController extends Controller
         // Create the user
         $user = $this->authService->createUser($validated);
 
+        $user->sendEmailVerificationNotification();
+
         Auth::login($user);
 
-        return redirect()->intended('/');
+        return redirect()->route('verification.notice');
+    }
+
+    public function verifyNotice()
+    {
+        return view('components.auth.verify-notice');
     }
 
     /**
